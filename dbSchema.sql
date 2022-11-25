@@ -53,7 +53,8 @@ ALTER TABLE "messages" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 CREATE TABLE "sessions" (
   "sid" varchar NOT NULL COLLATE "default",
   "sess" json NOT NULL,
-  "expire" timestamp(6) NOT NULL
+  "expire" timestamp(6) NOT NULL,
+	"token" text
 )
 WITH (OIDS=FALSE);
 

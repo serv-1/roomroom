@@ -4,7 +4,7 @@ import env from "../env";
 import passport from "passport";
 import MagicLoginStrategy from "passport-magic-login";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { string } from "yup";
+import { string, ValidationError } from "yup";
 import db from "../db";
 import type { DatabaseError } from "pg";
 import methods from "../middlewares/methods";
@@ -101,13 +101,21 @@ const router = express.Router();
 
 router.use(express.json());
 
+const emailSchema = string()
+  .trim()
+  .required("An email address is expected.")
+  .email("This email address is invalid.")
+  .typeError("This email address is invalid.");
+
 router.all(
   "/email",
   methods(["POST"]),
   forbidSessionUser,
   async (req, res, next) => {
-    if (!(await string().required().email().isValid(req.body.destination))) {
-      res.status(422).json({ error: "This email address is invalid." });
+    try {
+      await emailSchema.validate(req.body.destination);
+    } catch (e) {
+      res.status(422).json({ error: (e as ValidationError).message });
       return;
     }
 

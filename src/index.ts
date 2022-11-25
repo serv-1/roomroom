@@ -8,6 +8,8 @@ import helmet from "helmet";
 import env from "./env";
 import authRouter from "./routers/auth";
 import userRouter from "./routers/user";
+import roomsRouter from "./routers/rooms";
+import csrfRouter from "./routers/csrf";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
@@ -57,6 +59,8 @@ passport.deserializeUser((user, done) => {
 
 app.use("/auth", authRouter);
 app.use("/", userRouter);
+app.use("/", roomsRouter);
+app.use("/", csrfRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: "Not Found" });
