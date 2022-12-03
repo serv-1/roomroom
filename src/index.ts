@@ -10,6 +10,7 @@ import authRouter from "./routers/auth";
 import userRouter from "./routers/user";
 import roomsRouter from "./routers/rooms";
 import csrfRouter from "./routers/csrf";
+import s3PresignedPostRouter from "./routers/s3-presigned-post";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
@@ -61,6 +62,7 @@ app.use("/auth", authRouter);
 app.use("/", userRouter);
 app.use("/", roomsRouter);
 app.use("/", csrfRouter);
+app.use("/", s3PresignedPostRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: "Not Found" });

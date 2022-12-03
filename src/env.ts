@@ -25,6 +25,10 @@ const env = {
   PORT: getEnvVar("PORT"),
   GOOGLE_ID: getEnvVar("GOOGLE_ID"),
   GOOGLE_SECRET: getEnvVar("GOOGLE_SECRET"),
+  AWS_REGION: getEnvVar("AWS_REGION"),
+  AWS_ACCESS_KEY_ID: getEnvVar("AWS_ACCESS_KEY_ID"),
+  AWS_SECRET_ACCESS_KEY: getEnvVar("AWS_SECRET_ACCESS_KEY"),
+  AWS_BUCKET: getEnvVar("AWS_BUCKET"),
 };
 
 export default env;

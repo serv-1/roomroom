@@ -10,6 +10,7 @@ import type { DatabaseError } from "pg";
 import methods from "../middlewares/methods";
 import forbidSessionUser from "../middlewares/forbidSessionUser";
 import forbidAnonymUser from "../middlewares/forbidAnonymUser";
+import signOut from "../middlewares/signOut";
 
 const mj = Mailjet.apiConnect(env.MAILJET_KEY, env.MAILJET_SECRET);
 
@@ -101,12 +102,6 @@ const router = express.Router();
 
 router.use(express.json());
 
-const emailSchema = string()
-  .trim()
-  .required("An email address is expected.")
-  .email("This email address is invalid.")
-  .typeError("This email address is invalid.");
-
 router.all(
   "/email",
   methods(["POST"]),
@@ -134,24 +129,7 @@ router.all(
   }),
 );
 
-router.all(
-  "/sign-out",
-  methods(["DELETE"]),
-  forbidAnonymUser,
-  (req, res, next) => {
-    req.logOut((err) => {
-      if (err) next(err);
-
-      req.session.destroy((err) => {
-        if (err) next(err);
-
-        res.clearCookie("sId");
-
-        res.status(204).end();
-      });
-    });
-  },
-);
+router.all("/sign-out", methods(["DELETE"]), forbidAnonymUser, signOut);
 
 router.all(
   "/google",
@@ -171,3 +149,9 @@ router.all(
 );
 
 export default router;
+
+export const emailSchema = string()
+  .trim()
+  .required("An email address is expected.")
+  .email("This email address is invalid.")
+  .typeError("This email address is invalid.");

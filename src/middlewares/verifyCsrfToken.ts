@@ -31,7 +31,7 @@ const verifyCsrfToken: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    await updateCsrfToken();
+    await updateCsrfToken(req.sessionID);
 
     next();
   } catch (e) {

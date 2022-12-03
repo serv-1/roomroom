@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import express from "express";
 import db from "../db";
+import methods from "../middlewares/methods";
 
 const router = express.Router();
 
@@ -20,23 +21,24 @@ router
         return;
       }
 
-      const token = await updateCsrfToken();
+      const token = await updateCsrfToken(req.sessionID);
 
       res.status(200).json({ token });
     } catch (e) {
       next(e);
     }
   })
-  .all((req, res, next) => {
-    res.status(405).json({ error: "This method is not allowed." });
-  });
+  .all(methods([]));
 
 export default router;
 
-export const updateCsrfToken = async () => {
+export const updateCsrfToken = async (sessionId: string) => {
   const token = randomBytes(128).toString("base64");
 
-  await db.query("UPDATE sessions SET token=$1", [token]);
+  await db.query("UPDATE sessions SET token=$1 WHERE sid=$2", [
+    token,
+    sessionId,
+  ]);
 
   return token;
 };

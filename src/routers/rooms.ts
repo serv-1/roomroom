@@ -2,6 +2,7 @@ import express from "express";
 import { object, string, ValidationError } from "yup";
 import db from "../db";
 import forbidAnonymUser from "../middlewares/forbidAnonymUser";
+import methods from "../middlewares/methods";
 import verifyCsrfToken from "../middlewares/verifyCsrfToken";
 
 const createRoomSchema = object({
@@ -9,7 +10,7 @@ const createRoomSchema = object({
     .trim()
     .typeError("The subject is invalid.")
     .required("A subject is required.")
-    .max(150, "The subject cannot exceed 150 characters."),
+    .max(150, "The subject cannot exceed ${max} characters."),
   scope: string()
     .trim()
     .typeError("The scope must be either public or private.")
@@ -50,8 +51,6 @@ router
       next(e);
     }
   })
-  .all((req, res, next) => {
-    res.status(405).json({ error: "This method is not allowed." });
-  });
+  .all(methods([]));
 
 export default router;
