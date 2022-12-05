@@ -12,8 +12,33 @@ const updateUserSchema = object({
   name: string()
     .trim()
     .max(40, "The name cannot exceed ${max} characters.")
+    .test("unique", "This name is already taken.", async (value) => {
+      if (!value) return true;
+
+      const result = (
+        await db.query<{ exist: boolean }, string[]>(
+          "SELECT count(*) > 0 exist FROM users WHERE name=$1",
+          [value],
+        )
+      ).rows[0];
+
+      return !result?.exist;
+    })
     .typeError("This name is invalid."),
-  email: emailSchema.optional(),
+  email: emailSchema
+    .optional()
+    .test("unique", "This email is already taken.", async (value) => {
+      if (!value) return true;
+
+      const result = (
+        await db.query<{ exist: boolean }, string[]>(
+          "SELECT count(*) > 0 exist FROM users WHERE email=$1",
+          [value],
+        )
+      ).rows[0];
+
+      return !result?.exist;
+    }),
   image: string()
     .trim()
     .length(21, "The image name must have ${length} characters.")
@@ -47,7 +72,14 @@ router
       try {
         await updateUserSchema.validate(req.body);
       } catch (e) {
-        res.status(422).json({ error: (e as ValidationError).message });
+        const { type, message, path } = e as ValidationError;
+
+        if (type === "unique") {
+          res.status(422).json({ field: path, error: message });
+          return;
+        }
+
+        res.status(422).json({ error: message });
         return;
       }
 
