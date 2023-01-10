@@ -3,6 +3,7 @@
   "compilerOptions": {
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "noUncheckedIndexedAccess": false,
     "outDir": "dist"
   },
   "include": ["./src/**/*"]

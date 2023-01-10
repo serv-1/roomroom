@@ -1,7 +1,7 @@
 /* Designed with: https://dbdiagram.io/ */
 
 DROP TYPE IF EXISTS room_scope CASCADE;
-DROP TABLE IF EXISTS users, rooms, banned_users, messages, "sessions" CASCADE;
+DROP TABLE IF EXISTS users, rooms, members, messages, "sessions" CASCADE;
 
 CREATE TYPE "room_scope" AS ENUM (
   'public',
@@ -22,10 +22,11 @@ CREATE TABLE "rooms" (
   "creator_id" integer NOT NULL
 );
 
-CREATE TABLE "banned_users" (
+CREATE TABLE "members" (
   "id" serial PRIMARY KEY,
   "user_id" integer NOT NULL,
-  "room_id" integer NOT NULL
+  "room_id" integer NOT NULL,
+	"banned" boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "messages" (
@@ -40,9 +41,9 @@ CREATE TABLE "messages" (
 
 ALTER TABLE "rooms" ADD FOREIGN KEY ("creator_id") REFERENCES "users" ("id");
 
-ALTER TABLE "banned_users" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "banned_users" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
 
 ALTER TABLE "messages" ADD FOREIGN KEY ("author_id") REFERENCES "users" ("id");
 

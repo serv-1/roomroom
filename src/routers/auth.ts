@@ -73,7 +73,7 @@ const google = new GoogleStrategy(
     const email = ((profile.emails as Email[])[0] as Email).value;
 
     try {
-      let result = await db.query<{ id: string }, string[]>(
+      let result = await db.query<{ id: number }, string[]>(
         "SELECT id FROM users WHERE email=$1",
         [email],
       );
@@ -82,7 +82,7 @@ const google = new GoogleStrategy(
         const name =
           (email.split("@")[0] as string) + Math.round(Math.random() * 1000);
 
-        result = await db.query<{ id: string }, string[]>(
+        result = await db.query<{ id: number }, string[]>(
           "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id",
           [name, email],
         );

@@ -96,7 +96,7 @@ router
       try {
         if (req.body.image) {
           const result = (
-            await db.query<{ image: string }, string[]>(
+            await db.query<{ image: string }, number[]>(
               "SELECT image FROM users WHERE id=$1",
               [(req.user as Express.User).id],
             )
