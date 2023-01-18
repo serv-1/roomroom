@@ -33,7 +33,7 @@ CREATE TABLE "messages" (
   "id" serial PRIMARY KEY,
   "room_id" integer NOT NULL,
   "author_id" integer NOT NULL,
-  "created_at" date NOT NULL,
+  "created_at" timestamp NOT NULL DEFAULT now(),
   "text" text,
   "images" text[],
   "videos" text[]

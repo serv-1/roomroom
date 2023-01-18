@@ -2,6 +2,7 @@ import type { Request } from "express";
 import { RawData, WebSocket, WebSocketServer } from "ws";
 import { object, string } from "yup";
 import banMember from "./eventHandlers/banMember";
+import message from "./eventHandlers/message";
 import offlineMember from "./eventHandlers/offlineMember";
 import onlineMember from "./eventHandlers/onlineMember";
 import onlineMembers from "./eventHandlers/onlineMembers";
@@ -58,6 +59,9 @@ export async function messageHandler(ws: WebSocket, rawData: RawData) {
         break;
       case "banMember":
         await banMember(wss, ws, data);
+        break;
+      case "message":
+        await message(wss, ws, data);
         break;
       default:
         throw new Error();

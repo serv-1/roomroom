@@ -2,6 +2,7 @@ import express from "express";
 import { number } from "yup";
 import db from "../../db";
 import methods from "../../middlewares/methods";
+import verifyCsrfToken from "../../middlewares/verifyCsrfToken";
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ router.use(express.json());
 
 router
   .route("/rooms/:id")
-  .get(async (req, res, next) => {
+  .get(verifyCsrfToken, async (req, res, next) => {
     const { id } = req.params;
 
     if (!(await number().isValid(id))) {
@@ -24,6 +25,20 @@ router
     if (!room) {
       res.status(404).json({ error: "Chat room not found." });
       return;
+    }
+
+    if (room.scope === "private") {
+      const member = (
+        await db.query(
+          "SELECT id FROM members WHERE user_id=$1 AND room_id=$2",
+          [(req.user as Express.User).id, id],
+        )
+      ).rows[0];
+
+      if (!member) {
+        res.status(403).json({ error: "This chat room is private." });
+        return;
+      }
     }
 
     const { rows } = await db.query<{ user_id: number }, string[]>(
