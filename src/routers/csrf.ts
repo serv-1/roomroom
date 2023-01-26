@@ -10,8 +10,8 @@ router
   .get(async (req, res, next) => {
     try {
       const result = (
-        await db.query<{ token: string }, string[]>(
-          "SELECT token FROM sessions WHERE sid=$1",
+        await db.query<{ token: string }>(
+          `SELECT token FROM sessions WHERE sid=$1`,
           [req.sessionID],
         )
       ).rows[0];
@@ -35,7 +35,7 @@ export default router;
 export const updateCsrfToken = async (sessionId: string) => {
   const token = randomBytes(128).toString("base64");
 
-  await db.query("UPDATE sessions SET token=$1 WHERE sid=$2", [
+  await db.query(`UPDATE sessions SET token=$1 WHERE sid=$2`, [
     token,
     sessionId,
   ]);

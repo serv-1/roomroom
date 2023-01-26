@@ -17,7 +17,7 @@ describe("onlineMembers()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "SELECT id FROM rooms WHERE id=$1",
+      `SELECT id FROM rooms WHERE id=$1`,
       [data.roomId],
     );
   });

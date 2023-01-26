@@ -17,12 +17,12 @@ const offlineMember = async (
   if (ws.roomId === undefined) throw new Error("Already offline");
   if (userId !== ws.userId) throw new Error("Forbidden");
 
-  const room = (await db.query("SELECT id FROM rooms WHERE id=$1", [roomId]))
+  const room = (await db.query(`SELECT id FROM rooms WHERE id=$1`, [roomId]))
     .rows[0];
   if (!room) throw new Error("Room not found");
 
   const member = (
-    await db.query("SELECT id FROM members WHERE user_id=$1 AND room_id=$2", [
+    await db.query(`SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`, [
       userId,
       roomId,
     ])

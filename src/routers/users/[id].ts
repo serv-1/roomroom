@@ -18,10 +18,9 @@ router
     }
 
     const user = (
-      await db.query<User, string[]>(
-        "SELECT id, name, image FROM users WHERE id=$1",
-        [id],
-      )
+      await db.query<User>(`SELECT id, name, image FROM users WHERE id=$1`, [
+        id,
+      ])
     ).rows[0];
 
     if (!user) {

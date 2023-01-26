@@ -18,7 +18,7 @@ router
       const { url, fields } = await createPresignedPost(s3Client, {
         Key,
         Bucket: env.AWS_BUCKET,
-        Conditions: [["content-length-range", 0, 1048576]],
+        Conditions: [["content-length-range", 0, 100000000]],
         Expires: 60,
       });
 

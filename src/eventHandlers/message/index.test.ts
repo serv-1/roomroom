@@ -37,12 +37,12 @@ describe("message()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "SELECT id, scope FROM rooms WHERE id=$1",
+      `SELECT id, scope FROM rooms WHERE id=$1`,
       [0],
     );
   });
 
-  it("rejects if the room is private and the message's author is not one of its member", async () => {
+  it("rejects if the room is private and the author of the message is not one of its member", async () => {
     query.mockResolvedValue(queryResult).mockResolvedValueOnce({
       ...queryResult,
       rows: [{ id: 1, scope: "private" }],
@@ -56,7 +56,7 @@ describe("message()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       2,
-      "SELECT id FROM members WHERE user_id=$1 AND room_id=$2",
+      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
       [0, 1],
     );
   });
@@ -68,13 +68,15 @@ describe("message()", () => {
       query
         .mockResolvedValue({
           ...queryResult,
-          rows: [{ created_at: createdAt }],
+          rows: [{ name: "bob", image: null }],
         })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
+        .mockResolvedValueOnce(queryResult)
+        .mockResolvedValueOnce(queryResult)
         .mockResolvedValueOnce({
           ...queryResult,
-          rows: [{ id: 1 }],
-        })
-        .mockResolvedValueOnce(queryResult);
+          rows: [{ createdAt, id: 0 }],
+        });
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -93,19 +95,32 @@ describe("message()", () => {
 
       expect(query).toHaveBeenNthCalledWith(
         3,
-        "INSERT INTO members (user_id, room_id) VALUES ($1, $2)",
+        `INSERT INTO members ("userId", "roomId") VALUES ($1, $2)`,
         [2, 1],
       );
 
       expect(query).toHaveBeenNthCalledWith(
         4,
-        "INSERT INTO messages (room_id, author_id, text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING created_at",
+        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
         [1, 2, "test", null, null],
+      );
+
+      expect(query).toHaveBeenNthCalledWith(
+        5,
+        `SELECT name, image FROM users WHERE id=$1`,
+        [2],
       );
 
       const msgEvent = JSON.stringify({
         event: "message",
-        data: { authorId: 2, createdAt, text: "test" },
+        data: {
+          authorId: 2,
+          name: "bob",
+          image: null,
+          createdAt,
+          id: 0,
+          text: "test",
+        },
       });
 
       expect(wss[0].send).not.toHaveBeenCalled();
@@ -126,13 +141,14 @@ describe("message()", () => {
       query
         .mockResolvedValue({
           ...queryResult,
-          rows: [{ created_at: createdAt }],
+          rows: [{ name: "bob", image: null }],
         })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
         .mockResolvedValueOnce({
           ...queryResult,
-          rows: [{ id: 1 }],
-        })
-        .mockResolvedValueOnce(queryResult);
+          rows: [{ createdAt, id: 0 }],
+        });
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -147,14 +163,21 @@ describe("message()", () => {
       );
 
       expect(query).toHaveBeenNthCalledWith(
-        4,
-        "INSERT INTO messages (room_id, author_id, text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING created_at",
+        3,
+        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
         [1, 0, null, data.images, null],
       );
 
       const msgEvent = JSON.stringify({
         event: "message",
-        data: { authorId: 0, createdAt, images: data.images },
+        data: {
+          authorId: 0,
+          name: "bob",
+          image: null,
+          createdAt,
+          id: 0,
+          images: data.images,
+        },
       });
 
       expect(wss[0].send).toHaveBeenNthCalledWith(1, msgEvent);
@@ -166,13 +189,14 @@ describe("message()", () => {
       query
         .mockResolvedValue({
           ...queryResult,
-          rows: [{ created_at: createdAt }],
+          rows: [{ name: "bob", image: null }],
         })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
         .mockResolvedValueOnce({
           ...queryResult,
-          rows: [{ id: 1 }],
-        })
-        .mockResolvedValueOnce(queryResult);
+          rows: [{ createdAt, id: 0 }],
+        });
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -187,14 +211,21 @@ describe("message()", () => {
       );
 
       expect(query).toHaveBeenNthCalledWith(
-        4,
-        "INSERT INTO messages (room_id, author_id, text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING created_at",
+        3,
+        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
         [1, 0, null, null, data.videos],
       );
 
       const msgEvent = JSON.stringify({
         event: "message",
-        data: { authorId: 0, createdAt, videos: data.videos },
+        data: {
+          authorId: 0,
+          name: "bob",
+          image: null,
+          createdAt,
+          id: 0,
+          videos: data.videos,
+        },
       });
 
       expect(wss[0].send).toHaveBeenNthCalledWith(1, msgEvent);
@@ -206,13 +237,14 @@ describe("message()", () => {
       query
         .mockResolvedValue({
           ...queryResult,
-          rows: [{ created_at: createdAt }],
+          rows: [{ name: "bob", image: null }],
         })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
         .mockResolvedValueOnce({
           ...queryResult,
-          rows: [{ id: 1 }],
-        })
-        .mockResolvedValueOnce(queryResult);
+          rows: [{ createdAt, id: 0 }],
+        });
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -232,8 +264,8 @@ describe("message()", () => {
       );
 
       expect(query).toHaveBeenNthCalledWith(
-        4,
-        "INSERT INTO messages (room_id, author_id, text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING created_at",
+        3,
+        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
         [1, 0, data.text, data.images, data.videos],
       );
 
@@ -241,7 +273,10 @@ describe("message()", () => {
         event: "message",
         data: {
           authorId: 0,
+          name: "bob",
+          image: null,
           createdAt,
+          id: 0,
           text: data.text,
           images: data.images,
           videos: data.videos,
@@ -258,13 +293,17 @@ describe("message()", () => {
     query
       .mockResolvedValue({
         ...queryResult,
-        rows: [{ created_at: createdAt }],
+        rows: [{ name: "bob", image: null }],
       })
       .mockResolvedValueOnce({
         ...queryResult,
         rows: [{ id: 1, scope: "private" }],
       })
-      .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 0 }] });
+      .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 0 }] })
+      .mockResolvedValueOnce({
+        ...queryResult,
+        rows: [{ createdAt, id: 0 }],
+      });
 
     const wss = [
       { roomId: 0, userId: 0, send: jest.fn() },

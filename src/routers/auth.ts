@@ -38,8 +38,8 @@ const magicLogin = new MagicLoginStrategy({
     const email = payload.destination as string;
 
     try {
-      let result = await db.query<{ id: string }, string[]>(
-        "SELECT * FROM users WHERE email=$1",
+      let result = await db.query<{ id: string }>(
+        `SELECT * FROM users WHERE email=$1`,
         [email],
       );
 
@@ -47,8 +47,8 @@ const magicLogin = new MagicLoginStrategy({
         const name =
           (email.split("@")[0] as string) + Math.round(Math.random() * 1000);
 
-        result = await db.query<{ id: string }, string[]>(
-          "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id",
+        result = await db.query<{ id: string }>(
+          `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id`,
           [name, email],
         );
       }
@@ -73,8 +73,8 @@ const google = new GoogleStrategy(
     const email = ((profile.emails as Email[])[0] as Email).value;
 
     try {
-      let result = await db.query<{ id: number }, string[]>(
-        "SELECT id FROM users WHERE email=$1",
+      let result = await db.query<{ id: number }>(
+        `SELECT id FROM users WHERE email=$1`,
         [email],
       );
 
@@ -82,8 +82,8 @@ const google = new GoogleStrategy(
         const name =
           (email.split("@")[0] as string) + Math.round(Math.random() * 1000);
 
-        result = await db.query<{ id: number }, string[]>(
-          "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id",
+        result = await db.query<{ id: number }>(
+          `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id`,
           [name, email],
         );
       }

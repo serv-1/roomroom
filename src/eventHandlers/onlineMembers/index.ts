@@ -11,7 +11,7 @@ const onlineMembers = async (
 ) => {
   const { roomId } = await schema.validate(data);
 
-  const room = (await db.query("SELECT id FROM rooms WHERE id=$1", [roomId]))
+  const room = (await db.query(`SELECT id FROM rooms WHERE id=$1`, [roomId]))
     .rows[0];
   if (!room) throw new Error("Room not found");
 

@@ -42,7 +42,7 @@ describe("onlineMember()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "SELECT id FROM rooms WHERE id=$1",
+      `SELECT id FROM rooms WHERE id=$1`,
       [data.roomId],
     );
   });
@@ -61,7 +61,7 @@ describe("onlineMember()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       2,
-      "SELECT id FROM members WHERE user_id=$1 AND room_id=$2",
+      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
       [data.userId, data.roomId],
     );
   });

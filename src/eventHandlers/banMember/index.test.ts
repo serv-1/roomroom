@@ -39,7 +39,7 @@ describe("banMember()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "SELECT id FROM rooms WHERE id=$1 AND creator_id=$2 AND scope='private'",
+      `SELECT id FROM rooms WHERE id=$1 AND "creatorId"=$2 AND scope='private'`,
       [ws.roomId, ws.userId],
     );
   });
@@ -58,7 +58,7 @@ describe("banMember()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       2,
-      "SELECT id FROM members WHERE user_id=$1 AND room_id=$2",
+      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
       [data.id, ws.roomId],
     );
   });
@@ -97,7 +97,7 @@ describe("banMember()", () => {
 
     expect(query).toHaveBeenNthCalledWith(
       3,
-      "UPDATE members SET banned=true WHERE id=$1",
+      `UPDATE members SET banned=true WHERE id=$1`,
       [3],
     );
 

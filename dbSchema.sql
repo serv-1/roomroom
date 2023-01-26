@@ -19,35 +19,35 @@ CREATE TABLE "rooms" (
   "id" serial PRIMARY KEY,
   "subject" varchar(150) NOT NULL,
   "scope" room_scope NOT NULL,
-  "creator_id" integer NOT NULL
+  "creatorId" integer NOT NULL
 );
 
 CREATE TABLE "members" (
   "id" serial PRIMARY KEY,
-  "user_id" integer NOT NULL,
-  "room_id" integer NOT NULL,
+  "userId" integer NOT NULL,
+  "roomId" integer NOT NULL,
 	"banned" boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "messages" (
   "id" serial PRIMARY KEY,
-  "room_id" integer NOT NULL,
-  "author_id" integer NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT now(),
+  "roomId" integer NOT NULL,
+  "authorId" integer NOT NULL,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
   "text" text,
   "images" text[],
   "videos" text[]
 );
 
-ALTER TABLE "rooms" ADD FOREIGN KEY ("creator_id") REFERENCES "users" ("id");
+ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id");
 
-ALTER TABLE "members" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("userId") REFERENCES "users" ("id");
 
-ALTER TABLE "members" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id");
 
-ALTER TABLE "messages" ADD FOREIGN KEY ("author_id") REFERENCES "users" ("id");
+ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id");
 
-ALTER TABLE "messages" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("id");
+ALTER TABLE "messages" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id");
 
 /* node-connect-pg-simple */
 

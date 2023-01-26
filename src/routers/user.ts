@@ -16,8 +16,8 @@ const updateUserSchema = object({
       if (!value) return true;
 
       const result = (
-        await db.query<{ exist: boolean }, string[]>(
-          "SELECT count(*) > 0 exist FROM users WHERE name=$1",
+        await db.query<{ exist: boolean }>(
+          `SELECT count(*) > 0 exist FROM users WHERE name=$1`,
           [value],
         )
       ).rows[0];
@@ -31,8 +31,8 @@ const updateUserSchema = object({
       if (!value) return true;
 
       const result = (
-        await db.query<{ exist: boolean }, string[]>(
-          "SELECT count(*) > 0 exist FROM users WHERE email=$1",
+        await db.query<{ exist: boolean }>(
+          `SELECT count(*) > 0 exist FROM users WHERE email=$1`,
           [value],
         )
       ).rows[0];
@@ -52,7 +52,7 @@ router.use(express.json());
 router
   .route("/user")
   .get(async (req, res, next) => {
-    const result = await db.query("SELECT * FROM users WHERE id=$1", [
+    const result = await db.query(`SELECT * FROM users WHERE id=$1`, [
       req.user?.id,
     ]);
 
@@ -83,7 +83,7 @@ router
         return;
       }
 
-      let query = "UPDATE users SET";
+      let query = `UPDATE users SET`;
       const values: string[] = [];
 
       for (let i = 0; i < body.length; i++) {
@@ -96,8 +96,8 @@ router
       try {
         if (req.body.image) {
           const result = (
-            await db.query<{ image: string }, number[]>(
-              "SELECT image FROM users WHERE id=$1",
+            await db.query<{ image: string }>(
+              `SELECT image FROM users WHERE id=$1`,
               [(req.user as Express.User).id],
             )
           ).rows[0];
@@ -105,7 +105,7 @@ router
           if (result?.image) await deleteImage(result.image);
         }
 
-        await db.query(query + " WHERE id=$" + (body.length + 1), [
+        await db.query(`${query} WHERE id=$${body.length + 1}`, [
           ...values,
           (req.user as Express.User).id,
         ]);

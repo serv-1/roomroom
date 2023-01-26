@@ -10,7 +10,10 @@ export const pool = new Pool({
   ssl: env.NODE_ENV === "production",
 });
 
-export const query = async <R extends QueryResultRow, I extends unknown[]>(
+export const query = async <
+  R extends QueryResultRow,
+  I extends unknown[] = unknown[],
+>(
   queryTextOrConfig: string | QueryConfig<I> | QueryArrayConfig<I>,
   values?: I,
 ) => {
