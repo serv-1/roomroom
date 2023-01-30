@@ -86,4 +86,5 @@ export interface Room {
   scope: "public" | "private";
   creatorId: number;
   messages: RoomMessage[];
+  updatedAt: Date;
 }

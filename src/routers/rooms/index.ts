@@ -1,5 +1,5 @@
 import express from "express";
-import { object, string, ValidationError } from "yup";
+import { number, object, string, ValidationError } from "yup";
 import db from "../../db";
 import forbidAnonymUser from "../../middlewares/forbidAnonymUser";
 import methods from "../../middlewares/methods";
@@ -28,6 +28,38 @@ router.use(express.json());
 
 router
   .route("/rooms")
+  .get(async (req, res, next) => {
+    const { userId } = req.query;
+
+    if (!(await number().isValid(userId))) {
+      res.status(422).json({ error: "Invalid id" });
+      return;
+    }
+
+    const user = (await db.query(`SELECT id FROM users WHERE id=$1`, [userId]))
+      .rows[0];
+
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    let scope = "";
+
+    if (+(userId as string) !== req.user?.id) {
+      scope = `WHERE r.scope='public'`;
+    }
+
+    const rooms = (
+      await db.query(
+        `SELECT r.id, r.subject, r.scope, r."updatedAt" FROM rooms AS r
+				 JOIN members AS mem ON r.id=mem."roomId" AND mem."userId"=$1 ${scope}`,
+        [userId],
+      )
+    ).rows;
+
+    res.status(200).json({ rooms });
+  })
   .post(forbidAnonymUser, verifyCsrfToken, async (req, res, next) => {
     try {
       await createRoomSchema.validate(req.body);

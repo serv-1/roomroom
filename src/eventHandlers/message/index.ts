@@ -51,6 +51,11 @@ const message = async (
     )
   ).rows[0];
 
+  await db.query(`UPDATE rooms SET "updatedAt"=$1 WHERE id=$2`, [
+    message.createdAt,
+    roomId,
+  ]);
+
   const author = (
     await db.query<User>(`SELECT name, image FROM users WHERE id=$1`, [
       ws.userId,

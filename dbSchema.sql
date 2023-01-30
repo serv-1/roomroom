@@ -19,7 +19,8 @@ CREATE TABLE "rooms" (
   "id" serial PRIMARY KEY,
   "subject" varchar(150) NOT NULL,
   "scope" room_scope NOT NULL,
-  "creatorId" integer NOT NULL
+  "creatorId" integer NOT NULL,
+	"updatedAt" timestamp NOT NULL DEFAULT now()
 );
 
 CREATE TABLE "members" (

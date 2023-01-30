@@ -76,7 +76,8 @@ describe("message()", () => {
         .mockResolvedValueOnce({
           ...queryResult,
           rows: [{ createdAt, id: 0 }],
-        });
+        })
+        .mockResolvedValueOnce(queryResult);
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -107,6 +108,12 @@ describe("message()", () => {
 
       expect(query).toHaveBeenNthCalledWith(
         5,
+        `UPDATE rooms SET "updatedAt"=$1 WHERE id=$2`,
+        [createdAt, 1],
+      );
+
+      expect(query).toHaveBeenNthCalledWith(
+        6,
         `SELECT name, image FROM users WHERE id=$1`,
         [2],
       );
@@ -148,7 +155,8 @@ describe("message()", () => {
         .mockResolvedValueOnce({
           ...queryResult,
           rows: [{ createdAt, id: 0 }],
-        });
+        })
+        .mockResolvedValueOnce(queryResult);
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -196,7 +204,8 @@ describe("message()", () => {
         .mockResolvedValueOnce({
           ...queryResult,
           rows: [{ createdAt, id: 0 }],
-        });
+        })
+        .mockResolvedValueOnce(queryResult);
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -244,7 +253,8 @@ describe("message()", () => {
         .mockResolvedValueOnce({
           ...queryResult,
           rows: [{ createdAt, id: 0 }],
-        });
+        })
+        .mockResolvedValueOnce(queryResult);
 
       const wss = [
         { roomId: 0, userId: 0, send: jest.fn() },
@@ -303,7 +313,8 @@ describe("message()", () => {
       .mockResolvedValueOnce({
         ...queryResult,
         rows: [{ createdAt, id: 0 }],
-      });
+      })
+      .mockResolvedValueOnce(queryResult);
 
     const wss = [
       { roomId: 0, userId: 0, send: jest.fn() },
