@@ -6,16 +6,18 @@ import methods from "../../middlewares/methods";
 import verifyCsrfToken from "../../middlewares/verifyCsrfToken";
 import type { Room } from "./[id]";
 
+export const subjectSchema = string()
+  .typeError("The subject is invalid.")
+  .required("A subject is required.")
+  .trim()
+  .max(150, "The subject cannot exceed ${max} characters.");
+
 const createRoomSchema = object({
-  subject: string()
-    .trim()
-    .typeError("The subject is invalid.")
-    .required("A subject is required.")
-    .max(150, "The subject cannot exceed ${max} characters."),
+  subject: subjectSchema,
   scope: string()
-    .trim()
     .typeError("The scope must be either public or private.")
     .required("A scope is required.")
+    .trim()
     .matches(
       /^(public|private)$/,
       "The scope must be either public or private.",
@@ -62,7 +64,7 @@ router
   })
   .post(forbidAnonymUser, verifyCsrfToken, async (req, res, next) => {
     try {
-      await createRoomSchema.validate(req.body);
+      await createRoomSchema.validate(req.body, { strict: true });
     } catch (e) {
       res.status(422).json({ error: (e as ValidationError).message });
       return;

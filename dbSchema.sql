@@ -44,11 +44,11 @@ ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id");
 
 ALTER TABLE "members" ADD FOREIGN KEY ("userId") REFERENCES "users" ("id");
 
-ALTER TABLE "members" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id");
 
-ALTER TABLE "messages" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id");
+ALTER TABLE "messages" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
 
 /* node-connect-pg-simple */
 

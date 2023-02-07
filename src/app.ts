@@ -9,6 +9,7 @@ import roomsIdRouter from "./routers/rooms/[id]";
 import messagesRoomIdRouter from "./routers/messages/[roomId]";
 import csrfRouter from "./routers/csrf";
 import s3PresignedPostRouter from "./routers/s3-presigned-post";
+import inviteRouter from "./routers/invite";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
@@ -67,6 +68,7 @@ app.use("/", csrfRouter);
 app.use("/", s3PresignedPostRouter);
 app.use("/", usersIdRouter);
 app.use("/", messagesRoomIdRouter);
+app.use("/", inviteRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: "Not Found" });
