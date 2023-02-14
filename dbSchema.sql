@@ -50,6 +50,8 @@ ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id");
 
 ALTER TABLE "messages" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
 
+CREATE INDEX IDX_rooms_subject ON rooms USING GIN (to_tsvector('english', subject));
+
 /* node-connect-pg-simple */
 
 CREATE TABLE "sessions" (

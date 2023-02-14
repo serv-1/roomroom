@@ -6,6 +6,7 @@ import userRouter from "./routers/user";
 import usersIdRouter from "./routers/users/[id]";
 import roomsRouter from "./routers/rooms";
 import roomsIdRouter from "./routers/rooms/[id]";
+import roomsSearchRouter from "./routers/rooms/search";
 import messagesRoomIdRouter from "./routers/messages/[roomId]";
 import csrfRouter from "./routers/csrf";
 import s3PresignedPostRouter from "./routers/s3-presigned-post";
@@ -63,6 +64,7 @@ passport.deserializeUser((user, done) => {
 app.use("/auth", authRouter);
 app.use("/", userRouter);
 app.use("/", roomsRouter);
+app.use("/", roomsSearchRouter);
 app.use("/", roomsIdRouter);
 app.use("/", csrfRouter);
 app.use("/", s3PresignedPostRouter);
