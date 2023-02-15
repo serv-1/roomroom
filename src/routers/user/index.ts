@@ -1,12 +1,12 @@
 import express from "express";
 import { object, string, ValidationError } from "yup";
-import db from "../db";
-import deleteImage from "../deleteImage";
-import forbidAnonymUser from "../middlewares/forbidAnonymUser";
-import methods from "../middlewares/methods";
-import signOut from "../middlewares/signOut";
-import verifyCsrfToken from "../middlewares/verifyCsrfToken";
-import { emailSchema } from "./auth";
+import db from "../../db";
+import deleteImage from "../../deleteImage";
+import forbidAnonymUser from "../../middlewares/forbidAnonymUser";
+import methods from "../../middlewares/methods";
+import signOut from "../../middlewares/signOut";
+import verifyCsrfToken from "../../middlewares/verifyCsrfToken";
+import { emailSchema } from "../auth";
 
 const updateUserSchema = object({
   name: string()

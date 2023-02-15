@@ -3,6 +3,7 @@ import session, { SessionOptions, CookieOptions } from "express-session";
 import helmet from "helmet";
 import authRouter from "./routers/auth";
 import userRouter from "./routers/user";
+import userRoomsRouter from "./routers/user/rooms";
 import usersIdRouter from "./routers/users/[id]";
 import roomsRouter from "./routers/rooms";
 import roomsIdRouter from "./routers/rooms/[id]";
@@ -63,6 +64,7 @@ passport.deserializeUser((user, done) => {
 
 app.use("/auth", authRouter);
 app.use("/", userRouter);
+app.use("/", userRoomsRouter);
 app.use("/", roomsRouter);
 app.use("/", roomsSearchRouter);
 app.use("/", roomsIdRouter);
