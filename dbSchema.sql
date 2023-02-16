@@ -33,20 +33,20 @@ CREATE TABLE "members" (
 CREATE TABLE "messages" (
   "id" serial PRIMARY KEY,
   "roomId" integer NOT NULL,
-  "authorId" integer NOT NULL,
+  "authorId" integer,
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "text" text,
   "images" text[],
   "videos" text[]
 );
 
-ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id");
+ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id") ON DELETE CASCADE;
 
-ALTER TABLE "members" ADD FOREIGN KEY ("userId") REFERENCES "users" ("id");
+ALTER TABLE "members" ADD FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "members" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
 
-ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id");
+ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id") ON DELETE SET NULL;
 
 ALTER TABLE "messages" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
 

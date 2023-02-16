@@ -58,10 +58,21 @@ router
       await db.query<
         Omit<RoomMessage, "roomId"> & Pick<User, "name" | "image">
       >(
-        `SELECT msg.id, msg."authorId", u.name, u.image, mem.banned, msg."createdAt", msg.text, msg.images, msg.videos
-        	FROM messages AS msg JOIN users AS u ON msg."authorId"=u.id
-        	JOIN members AS mem ON mem."roomId"=$1 AND mem."userId"=u.id
-        	WHERE msg."roomId"=$1 ORDER BY msg."createdAt" DESC LIMIT 15`,
+        `SELECT
+						msg.id,
+						msg."authorId",
+						u.name,
+						u.image,
+						COALESCE(mem.banned, false) AS banned,
+						msg."createdAt",
+						msg.text,
+						msg.images,
+						msg.videos
+        	FROM messages AS msg
+						LEFT JOIN users AS u ON msg."authorId"=u.id
+        		LEFT JOIN members AS mem ON mem."roomId"=$1 AND mem."userId"=u.id
+        	WHERE msg."roomId"=$1
+						ORDER BY msg."createdAt" DESC LIMIT 15`,
         [id],
       )
     ).rows.reverse();
@@ -169,7 +180,7 @@ export default router;
 export interface RoomMessage {
   id: number;
   roomId: number;
-  authorId: number;
+  authorId: number | null;
   createdAt: Date;
   text: string | null;
   images: string[] | null;

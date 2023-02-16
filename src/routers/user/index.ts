@@ -1,3 +1,4 @@
+import type { ObjectIdentifier } from "@aws-sdk/client-s3";
 import express from "express";
 import { object, string, ValidationError } from "yup";
 import db from "../../db";
@@ -7,6 +8,7 @@ import methods from "../../middlewares/methods";
 import signOut from "../../middlewares/signOut";
 import verifyCsrfToken from "../../middlewares/verifyCsrfToken";
 import { emailSchema } from "../auth";
+import type { RoomMessage } from "../rooms/[id]";
 
 const updateUserSchema = object({
   name: string()
@@ -118,6 +120,35 @@ router
       } catch (e) {
         next(e);
       }
+    },
+    signOut,
+  )
+  .delete(
+    forbidAnonymUser,
+    verifyCsrfToken,
+    async (req, res, next) => {
+      const userId = (req.user as Express.User).id;
+
+      const messages = (
+        await db.query<Pick<RoomMessage, "images" | "videos">>(
+          `SELECT m.images, m.videos FROM messages AS m
+				 JOIN rooms AS r ON m."roomId"=r.id WHERE r."creatorId"=$1`,
+          [userId],
+        )
+      ).rows;
+
+      const objects: ObjectIdentifier[] = [];
+
+      for (const message of messages) {
+        message.images?.forEach((image) => objects.push({ Key: image }));
+        message.videos?.forEach((video) => objects.push({ Key: video }));
+      }
+
+      if (objects.length) await deleteImage(objects);
+
+      await db.query(`DELETE FROM users WHERE id=$1`, [userId]);
+
+      next();
     },
     signOut,
   )

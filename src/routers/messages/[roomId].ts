@@ -61,11 +61,21 @@ router
 
     const messages = (
       await db.query(
-        `SELECT msg.id, msg."authorId", u.name, u.image, mem.banned, msg."createdAt", msg.text, msg.images, msg.videos
-					FROM messages AS msg JOIN users AS u ON msg."authorId"=u.id
-					JOIN members AS mem ON mem."roomId"=$1 AND mem."userId"=u.id
+        `SELECT
+						msg.id,
+						msg."authorId",
+						u.name,
+						u.image,
+						COALESCE(mem.banned, false) AS banned,
+						msg."createdAt",
+						msg.text,
+						msg.images,
+						msg.videos
+					FROM messages AS msg
+						LEFT JOIN users AS u ON msg."authorId"=u.id
+						LEFT JOIN members AS mem ON mem."roomId"=$1 AND mem."userId"=u.id
 					WHERE msg."roomId"=$1 AND msg.id < $2
-					ORDER BY msg."createdAt" DESC LIMIT 15`,
+						ORDER BY msg."createdAt" DESC LIMIT 15`,
         [roomId, msgId],
       )
     ).rows.reverse();
