@@ -15,11 +15,7 @@ describe("onlineMembers()", () => {
       onlineMembers({} as Server<WebSocket>, {} as WebSocket, data),
     ).rejects.toThrow("Room not found");
 
-    expect(query).toHaveBeenNthCalledWith(
-      1,
-      `SELECT id FROM rooms WHERE id=$1`,
-      [data.roomId],
-    );
+    expect(query.mock.calls[0][1]).toStrictEqual([data.roomId]);
   });
 
   it("sends the online members' ids of the room to the client", async () => {

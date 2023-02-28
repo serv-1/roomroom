@@ -67,7 +67,8 @@ router
 						msg."createdAt",
 						msg.text,
 						msg.images,
-						msg.videos
+						msg.videos,
+						msg.gif
         	FROM messages AS msg
 						LEFT JOIN users AS u ON msg."authorId"=u.id
         		LEFT JOIN members AS mem ON mem."roomId"=$1 AND mem."userId"=u.id
@@ -185,6 +186,7 @@ export interface RoomMessage {
   text: string | null;
   images: string[] | null;
   videos: string[] | null;
+  gif: string | null;
 }
 
 export interface Room {

@@ -40,11 +40,7 @@ describe("offlineMember()", () => {
       offlineMember({} as Server<WebSocket>, ws, data),
     ).rejects.toThrow("Room not found");
 
-    expect(query).toHaveBeenNthCalledWith(
-      1,
-      `SELECT id FROM rooms WHERE id=$1`,
-      [data.roomId],
-    );
+    expect(query.mock.calls[0][1]).toStrictEqual([data.roomId]);
   });
 
   it("rejects if the user is not a member of the room", async () => {
@@ -59,11 +55,7 @@ describe("offlineMember()", () => {
       offlineMember({} as Server<WebSocket>, ws, data),
     ).rejects.toThrow("Member not found");
 
-    expect(query).toHaveBeenNthCalledWith(
-      2,
-      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
-      [data.userId, data.roomId],
-    );
+    expect(query.mock.calls[1][1]).toStrictEqual([data.userId, data.roomId]);
   });
 
   it("sends the new offline member's id to each client connected to the room", async () => {

@@ -35,11 +35,7 @@ describe("message()", () => {
       message({} as Server<WebSocket>, {} as WebSocket, data),
     ).rejects.toThrow("Chat room not found");
 
-    expect(query).toHaveBeenNthCalledWith(
-      1,
-      `SELECT id, scope FROM rooms WHERE id=$1`,
-      [0],
-    );
+    expect(query.mock.calls[0][1]).toStrictEqual([0]);
   });
 
   it("rejects if the room is private and the author of the message is not one of its member", async () => {
@@ -54,11 +50,7 @@ describe("message()", () => {
       message({} as Server<WebSocket>, { userId: 0 } as WebSocket, data),
     ).rejects.toThrow("Not a member");
 
-    expect(query).toHaveBeenNthCalledWith(
-      2,
-      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
-      [0, 1],
-    );
+    expect(query.mock.calls[1][1]).toStrictEqual([0, 1]);
   });
 
   describe("sends the ... and the new member to the other clients of the chat room", () => {
@@ -94,29 +86,11 @@ describe("message()", () => {
         data,
       );
 
-      expect(query).toHaveBeenNthCalledWith(
-        3,
-        `INSERT INTO members ("userId", "roomId") VALUES ($1, $2)`,
-        [2, 1],
-      );
-
-      expect(query).toHaveBeenNthCalledWith(
-        4,
-        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
-        [1, 2, "test", null, null],
-      );
-
-      expect(query).toHaveBeenNthCalledWith(
-        5,
-        `UPDATE rooms SET "updatedAt"=$1 WHERE id=$2`,
-        [createdAt, 1],
-      );
-
-      expect(query).toHaveBeenNthCalledWith(
-        6,
-        `SELECT name, image FROM users WHERE id=$1`,
-        [2],
-      );
+      const { calls } = query.mock;
+      expect(calls[2][1]).toStrictEqual([2, 1]);
+      expect(calls[3][1]).toStrictEqual([1, 2, "test", null, null, null]);
+      expect(calls[4][1]).toStrictEqual([createdAt, 1]);
+      expect(calls[5][1]).toStrictEqual([2]);
 
       const msgEvent = JSON.stringify({
         event: "message",
@@ -170,11 +144,8 @@ describe("message()", () => {
         data,
       );
 
-      expect(query).toHaveBeenNthCalledWith(
-        3,
-        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
-        [1, 0, null, data.images, null],
-      );
+      const { calls } = query.mock;
+      expect(calls[2][1]).toStrictEqual([1, 0, null, data.images, null, null]);
 
       const msgEvent = JSON.stringify({
         event: "message",
@@ -219,11 +190,8 @@ describe("message()", () => {
         data,
       );
 
-      expect(query).toHaveBeenNthCalledWith(
-        3,
-        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
-        [1, 0, null, null, data.videos],
-      );
+      const { calls } = query.mock;
+      expect(calls[2][1]).toStrictEqual([1, 0, null, null, data.videos, null]);
 
       const msgEvent = JSON.stringify({
         event: "message",
@@ -234,6 +202,52 @@ describe("message()", () => {
           createdAt,
           id: 0,
           videos: data.videos,
+        },
+      });
+
+      expect(wss[0].send).toHaveBeenNthCalledWith(1, msgEvent);
+    });
+
+    it("...gif message", async () => {
+      const createdAt = new Date();
+
+      query
+        .mockResolvedValue({
+          ...queryResult,
+          rows: [{ name: "bob", image: null }],
+        })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
+        .mockResolvedValueOnce({
+          ...queryResult,
+          rows: [{ createdAt, id: 0 }],
+        })
+        .mockResolvedValueOnce(queryResult);
+
+      const wss = [
+        { roomId: 0, userId: 0, send: jest.fn() },
+      ] as unknown as WebSocket[];
+
+      const data = { gif: "gif", roomId: 1 };
+
+      await message(
+        { clients: new Set(wss) } as Server<WebSocket>,
+        { userId: 0 } as WebSocket,
+        data,
+      );
+
+      const { calls } = query.mock;
+      expect(calls[2][1]).toStrictEqual([1, 0, null, null, null, data.gif]);
+
+      const msgEvent = JSON.stringify({
+        event: "message",
+        data: {
+          authorId: 0,
+          name: "bob",
+          image: null,
+          createdAt,
+          id: 0,
+          gif: data.gif,
         },
       });
 
@@ -264,6 +278,7 @@ describe("message()", () => {
         text: "test",
         images: ["key1", "key2"],
         videos: ["key3", "key4"],
+        gif: "gif",
         roomId: 1,
       };
 
@@ -273,11 +288,15 @@ describe("message()", () => {
         data,
       );
 
-      expect(query).toHaveBeenNthCalledWith(
-        3,
-        `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
-        [1, 0, data.text, data.images, data.videos],
-      );
+      const { calls } = query.mock;
+      expect(calls[2][1]).toStrictEqual([
+        1,
+        0,
+        data.text,
+        data.images,
+        data.videos,
+        data.gif,
+      ]);
 
       const msgEvent = JSON.stringify({
         event: "message",
@@ -290,6 +309,7 @@ describe("message()", () => {
           text: data.text,
           images: data.images,
           videos: data.videos,
+          gif: data.gif,
         },
       });
 

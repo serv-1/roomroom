@@ -9,6 +9,7 @@ const schema = object({
   videos: array(string().required()).min(1),
   text: string().max(500),
   roomId: number().required(),
+  gif: string(),
 });
 
 const message = async (
@@ -16,9 +17,9 @@ const message = async (
   ws: WebSocket,
   data: unknown,
 ) => {
-  const { images, videos, text, roomId } = await schema.validate(data);
+  const { images, videos, text, roomId, gif } = await schema.validate(data);
 
-  if (!images && !videos && !text) throw new Error("Message empty");
+  if (!images && !videos && !text && !gif) throw new Error("Message empty");
 
   const room = (
     await db.query<Pick<Room, "id" | "scope">>(
@@ -45,9 +46,18 @@ const message = async (
   }
 
   const message = (
-    await db.query<{ createdAt: Date; id: number }>(
-      `INSERT INTO messages ("roomId", "authorId", text, images, videos) VALUES ($1, $2, $3, $4, $5) RETURNING "createdAt", id`,
-      [roomId, ws.userId, text || null, images || null, videos || null],
+    await db.query<Pick<MessageData, "createdAt" | "id">>(
+      `INSERT INTO messages ("roomId", "authorId", text, images, videos, gif)
+				VALUES ($1, $2, $3, $4, $5, $6)
+				RETURNING "createdAt", id`,
+      [
+        roomId,
+        ws.userId,
+        text || null,
+        images || null,
+        videos || null,
+        gif || null,
+      ],
     )
   ).rows[0];
 
@@ -70,6 +80,7 @@ const message = async (
     if (text) data.text = text;
     if (images) data.images = images;
     if (videos) data.videos = videos;
+    if (gif) data.gif = gif;
 
     client.send(JSON.stringify({ event: "message", data }));
 
@@ -89,5 +100,6 @@ interface MessageData {
   text?: string;
   images?: string[];
   videos?: string[];
+  gif?: string;
   createdAt: Date;
 }

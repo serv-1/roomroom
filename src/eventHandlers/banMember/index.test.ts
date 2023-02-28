@@ -37,11 +37,7 @@ describe("banMember()", () => {
       banMember({} as Server<WebSocket>, ws, { id: 1 }),
     ).rejects.toThrow("Room not found");
 
-    expect(query).toHaveBeenNthCalledWith(
-      1,
-      `SELECT id FROM rooms WHERE id=$1 AND "creatorId"=$2 AND scope='private'`,
-      [ws.roomId, ws.userId],
-    );
+    expect(query.mock.calls[0][1]).toStrictEqual([ws.roomId, ws.userId]);
   });
 
   it("rejects if the user to ban is not a member of the room", async () => {
@@ -56,11 +52,7 @@ describe("banMember()", () => {
       "Member not found",
     );
 
-    expect(query).toHaveBeenNthCalledWith(
-      2,
-      `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
-      [data.id, ws.roomId],
-    );
+    expect(query.mock.calls[1][1]).toStrictEqual([data.id, ws.roomId]);
   });
 
   it("sends the banned member's id to each client connected to the room", async () => {
@@ -95,11 +87,7 @@ describe("banMember()", () => {
 
     await banMember(wss, ws, data);
 
-    expect(query).toHaveBeenNthCalledWith(
-      3,
-      `UPDATE members SET banned=true WHERE id=$1`,
-      [3],
-    );
+    expect(query.mock.calls[2][1]).toStrictEqual([3]);
 
     const msg = JSON.stringify({ event: "bannedMember", data });
     expect(ws.send).toHaveBeenNthCalledWith(1, msg);

@@ -37,7 +37,8 @@ CREATE TABLE "messages" (
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "text" text,
   "images" text[],
-  "videos" text[]
+  "videos" text[],
+	"gif" text
 );
 
 ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id") ON DELETE CASCADE;
