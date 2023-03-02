@@ -46,19 +46,30 @@ router
       return;
     }
 
-    let scope = "";
+    let query = `
+			SELECT r.id, r.subject, r.scope, r."updatedAt" FROM rooms AS r
+				JOIN members AS mem ON r.id=mem."roomId" AND mem."userId"=$1
+			WHERE r.scope='public'
+		`;
 
-    if (+(userId as string) !== req.user?.id) {
-      scope = `WHERE r.scope='public'`;
+    if (req.user?.id === +(userId as string)) {
+      query = `
+				SELECT
+					r.id,
+					r.subject,
+					r.scope,
+					r."updatedAt",
+					(
+						count(*) FILTER (WHERE msg.id > mem."lastMsgSeenId")
+					)::INTEGER AS "nbOfUnseenMsg"
+		 		FROM rooms AS r
+			 		JOIN members AS mem ON r.id=mem."roomId" AND mem."userId"=$1
+			 		JOIN messages AS msg ON msg."roomId"=r.id
+				GROUP BY r.id
+			`;
     }
 
-    const rooms = (
-      await db.query(
-        `SELECT r.id, r.subject, r.scope, r."updatedAt" FROM rooms AS r
-				 JOIN members AS mem ON r.id=mem."roomId" AND mem."userId"=$1 ${scope}`,
-        [userId],
-      )
-    ).rows;
+    const rooms = (await db.query(query, [userId])).rows;
 
     res.status(200).json({ rooms });
   })

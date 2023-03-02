@@ -64,6 +64,7 @@ describe("message()", () => {
         })
         .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
         .mockResolvedValueOnce(queryResult)
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 0 }] })
         .mockResolvedValueOnce(queryResult)
         .mockResolvedValueOnce({
           ...queryResult,
@@ -87,10 +88,11 @@ describe("message()", () => {
       );
 
       const { calls } = query.mock;
-      expect(calls[2][1]).toStrictEqual([2, 1]);
-      expect(calls[3][1]).toStrictEqual([1, 2, "test", null, null, null]);
-      expect(calls[4][1]).toStrictEqual([createdAt, 1]);
-      expect(calls[5][1]).toStrictEqual([2]);
+      expect(calls[2][1]).toStrictEqual([1]);
+      expect(calls[3][1]).toStrictEqual([2, 1, 0]);
+      expect(calls[4][1]).toStrictEqual([1, 2, "test", null, null, null]);
+      expect(calls[5][1]).toStrictEqual([createdAt, 1]);
+      expect(calls[6][1]).toStrictEqual([2]);
 
       const msgEvent = JSON.stringify({
         event: "message",
@@ -126,10 +128,7 @@ describe("message()", () => {
         })
         .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
         .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
-        .mockResolvedValueOnce({
-          ...queryResult,
-          rows: [{ createdAt, id: 0 }],
-        })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ createdAt, id: 0 }] })
         .mockResolvedValueOnce(queryResult);
 
       const wss = [
@@ -172,10 +171,7 @@ describe("message()", () => {
         })
         .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
         .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
-        .mockResolvedValueOnce({
-          ...queryResult,
-          rows: [{ createdAt, id: 0 }],
-        })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ createdAt, id: 0 }] })
         .mockResolvedValueOnce(queryResult);
 
       const wss = [
@@ -218,10 +214,7 @@ describe("message()", () => {
         })
         .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
         .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
-        .mockResolvedValueOnce({
-          ...queryResult,
-          rows: [{ createdAt, id: 0 }],
-        })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ createdAt, id: 0 }] })
         .mockResolvedValueOnce(queryResult);
 
       const wss = [
@@ -264,10 +257,7 @@ describe("message()", () => {
         })
         .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 1 }] })
         .mockResolvedValueOnce({ ...queryResult, rows: [{}] })
-        .mockResolvedValueOnce({
-          ...queryResult,
-          rows: [{ createdAt, id: 0 }],
-        })
+        .mockResolvedValueOnce({ ...queryResult, rows: [{ createdAt, id: 0 }] })
         .mockResolvedValueOnce(queryResult);
 
       const wss = [
@@ -330,10 +320,7 @@ describe("message()", () => {
         rows: [{ id: 1, scope: "private" }],
       })
       .mockResolvedValueOnce({ ...queryResult, rows: [{ id: 0 }] })
-      .mockResolvedValueOnce({
-        ...queryResult,
-        rows: [{ createdAt, id: 0 }],
-      })
+      .mockResolvedValueOnce({ ...queryResult, rows: [{ createdAt, id: 0 }] })
       .mockResolvedValueOnce(queryResult);
 
     const wss = [

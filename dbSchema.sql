@@ -27,7 +27,8 @@ CREATE TABLE "members" (
   "id" serial PRIMARY KEY,
   "userId" integer NOT NULL,
   "roomId" integer NOT NULL,
-	"banned" boolean NOT NULL DEFAULT false
+	"banned" boolean NOT NULL DEFAULT false,
+	"lastMsgSeenId" integer NOT NULL
 );
 
 CREATE TABLE "messages" (
@@ -46,6 +47,8 @@ ALTER TABLE "rooms" ADD FOREIGN KEY ("creatorId") REFERENCES "users" ("id") ON D
 ALTER TABLE "members" ADD FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "members" ADD FOREIGN KEY ("roomId") REFERENCES "rooms" ("id") ON DELETE CASCADE;
+
+ALTER TABLE "members" ADD FOREIGN KEY ("lastMsgSeenId") REFERENCES "messages" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "messages" ADD FOREIGN KEY ("authorId") REFERENCES "users" ("id") ON DELETE SET NULL;
 

@@ -1,7 +1,7 @@
 import type { Server, WebSocket } from "ws";
 import { array, number, object, string } from "yup";
 import db from "../../db";
-import type { Room } from "../../routers/rooms/[id]";
+import type { Room, RoomMessage } from "../../routers/rooms/[id]";
 import type { User } from "../../routers/users/[id]";
 
 const schema = object({
@@ -39,10 +39,17 @@ const message = async (
   if (!member) {
     if (room.scope === "private") throw new Error("Not a member");
 
-    await db.query(`INSERT INTO members ("userId", "roomId") VALUES ($1, $2)`, [
-      ws.userId,
-      roomId,
-    ]);
+    const lastMsg = (
+      await db.query<Pick<RoomMessage, "id">>(
+        `SELECT id FROM messages WHERE "roomId"=$1 ORDER BY "createdAt" DESC LIMIT 1`,
+        [roomId],
+      )
+    ).rows[0];
+
+    await db.query(
+      `INSERT INTO members ("userId", "roomId", "lastMsgSeenId") VALUES ($1, $2, $3)`,
+      [ws.userId, roomId, lastMsg.id],
+    );
   }
 
   const message = (

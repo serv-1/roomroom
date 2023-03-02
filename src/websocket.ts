@@ -6,6 +6,7 @@ import message from "./eventHandlers/message";
 import offlineMember from "./eventHandlers/offlineMember";
 import onlineMember from "./eventHandlers/onlineMember";
 import onlineMembers from "./eventHandlers/onlineMembers";
+import seeMessage from "./eventHandlers/seeMessage";
 
 const wss = new WebSocketServer({ clientTracking: true, noServer: true });
 
@@ -62,6 +63,9 @@ export async function messageHandler(ws: WebSocket, rawData: RawData) {
         break;
       case "message":
         await message(wss, ws, data);
+        break;
+      case "seeMessage":
+        await seeMessage(wss, ws, data);
         break;
       default:
         throw new Error();

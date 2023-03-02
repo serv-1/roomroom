@@ -33,18 +33,18 @@ router
       return;
     }
 
-    if (room.scope === "private") {
-      const member = (
-        await db.query(
-          `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
-          [(req.user as Express.User).id, id],
-        )
-      ).rows[0];
+    const userId = req.user?.id;
 
-      if (!member) {
-        res.status(403).json({ error: "This chat room is private." });
-        return;
-      }
+    const member = (
+      await db.query(
+        `SELECT id FROM members WHERE "userId"=$1 AND "roomId"=$2`,
+        [userId, id],
+      )
+    ).rows[0];
+
+    if (room.scope === "private" && !member) {
+      res.status(403).json({ error: "This chat room is private." });
+      return;
     }
 
     const members = (
@@ -78,11 +78,28 @@ router
       )
     ).rows.reverse();
 
-    res.status(200).json({
+    const json = {
       ...room,
       memberIds: members.map(({ userId }) => userId),
       messages,
-    });
+    };
+
+    if (userId && (room.creatorId === userId || member)) {
+      const nbOfUnseenMsg = (
+        await db.query<{ count: number }>(
+          `SELECT count(*)::INTEGER FROM messages WHERE "roomId"=$1 AND id > (
+    				SELECT "lastMsgSeenId" FROM members
+    				WHERE "roomId"=$1 AND "userId"=$2
+    			)`,
+          [id, userId],
+        )
+      ).rows[0].count;
+
+      res.status(200).json({ ...json, nbOfUnseenMsg });
+      return;
+    }
+
+    res.status(200).json(json);
   })
   .put(forbidAnonymUser, verifyCsrfToken, async (req, res, next) => {
     const { id } = req.params;
