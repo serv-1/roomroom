@@ -34,7 +34,10 @@ describe("onlineMembers()", () => {
 
     expect(ws.send).toHaveBeenNthCalledWith(
       1,
-      JSON.stringify({ event: "onlineMembers", data: { ids: [0, 1] } }),
+      JSON.stringify({
+        event: "onlineMembers",
+        data: { ids: [0, 1], roomId: 0 },
+      }),
     );
   });
 });

@@ -22,7 +22,7 @@ const onlineMembers = async (
     ids.push(client.userId);
   });
 
-  ws.send(JSON.stringify({ event: "onlineMembers", data: { ids } }));
+  ws.send(JSON.stringify({ event: "onlineMembers", data: { ids, roomId } }));
 };
 
 export default onlineMembers;
