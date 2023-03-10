@@ -10,7 +10,6 @@ import roomsIdRouter from "./routers/rooms/[id]";
 import roomsSearchRouter from "./routers/rooms/search";
 import messagesRoomIdRouter from "./routers/messages/[roomId]";
 import csrfRouter from "./routers/csrf";
-import s3PresignedPostRouter from "./routers/s3-presigned-post";
 import inviteRouter from "./routers/invite";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -45,7 +44,6 @@ const sess: SessionOptions = {
 };
 
 if (env.NODE_ENV === "production") {
-  // app.set("trust proxy", 1)
   (sess.cookie as CookieOptions).secure = true;
 }
 
@@ -69,7 +67,6 @@ app.use("/", roomsRouter);
 app.use("/", roomsSearchRouter);
 app.use("/", roomsIdRouter);
 app.use("/", csrfRouter);
-app.use("/", s3PresignedPostRouter);
 app.use("/", usersIdRouter);
 app.use("/", messagesRoomIdRouter);
 app.use("/", inviteRouter);
