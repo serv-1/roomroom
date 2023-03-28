@@ -14,20 +14,25 @@ import inviteRouter from "./routers/invite";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import env from "./env";
+import compression from "compression";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 
-app.use(helmet());
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  legacyHeaders: false,
+  standardHeaders: true,
+});
 
-app.use(
-  cors({
-    origin: env.CLIENT_URL,
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
-  }),
-);
+const corsOptions: CorsOptions = {
+  origin: env.CLIENT_URL,
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
+};
 
 const sess: SessionOptions = {
   name: "sId",
@@ -49,6 +54,10 @@ if (env.NODE_ENV === "production") {
 
 export const sessionParser = session(sess);
 
+app.use(compression());
+app.use(limiter);
+app.use(helmet());
+app.use(cors(corsOptions));
 app.use(sessionParser);
 app.use(passport.session());
 
