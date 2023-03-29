@@ -124,8 +124,8 @@ router.all(
   methods(["GET"]),
   forbidSessionUser,
   passport.authenticate("magiclogin", {
-    successRedirect: env.CLIENT_URL + "/RoomRoom",
-    failureRedirect: env.CLIENT_URL + "/RoomRoom",
+    successRedirect: env.CLIENT_URL,
+    failureRedirect: env.CLIENT_URL,
   }),
 );
 
@@ -143,8 +143,8 @@ router.all(
   methods(["GET"]),
   forbidSessionUser,
   passport.authenticate("google", {
-    successRedirect: env.CLIENT_URL + "/RoomRoom",
-    failureRedirect: env.CLIENT_URL + "/RoomRoom",
+    successRedirect: env.CLIENT_URL,
+    failureRedirect: env.CLIENT_URL,
   }),
 );
 
