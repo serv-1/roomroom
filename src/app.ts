@@ -49,6 +49,7 @@ const sess: SessionOptions = {
 };
 
 if (env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
   (sess.cookie as CookieOptions).secure = true;
 }
 
