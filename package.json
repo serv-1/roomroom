@@ -1,5 +1,5 @@
 {
-  "name": "roomroom_backend",
+  "name": "roomroom-api",
   "version": "1.0.0",
   "scripts": {
     "start": "nodemon ./dist/index.js",
