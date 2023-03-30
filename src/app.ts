@@ -44,6 +44,7 @@ const sess: SessionOptions = {
     domain: env.CLIENT_DOMAIN,
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24,
+    sameSite: "none",
   },
   store: new (connectPg(session))({ pool, tableName: "sessions" }),
 };
