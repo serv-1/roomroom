@@ -1,0 +1,23 @@
+.modal {
+  @apply absolute -bottom-full left-0 flex w-full flex-col gap-y-4 rounded-t-2xl bg-blue-50 p-2 shadow-24 transition-[bottom] duration-500 dark:bg-dark-24 dark:text-blue-50 md:-bottom-1/2 md:left-1/2 md:w-[352px] md:-translate-x-1/2 md:scale-50 md:rounded-2xl md:p-4 md:opacity-0 md:transition-[transform,opacity];
+}
+
+.modal--open {
+  @apply bottom-0 ease-out md:bottom-1/2 md:translate-y-1/2 md:scale-100 md:opacity-100;
+}
+
+.modal--close {
+  @apply -bottom-full ease-in md:bottom-1/2 md:scale-50 md:opacity-0;
+}
+
+.modal__overlay {
+  @apply absolute top-0 left-0 h-screen w-screen bg-transparent transition-colors duration-[400ms];
+}
+
+.modal__overlay--open {
+  @apply bg-dark/50 dark:bg-blue-50/[.25];
+}
+
+.modal__overlay--close {
+  @apply bg-transparent dark:bg-transparent;
+}

@@ -1,10 +1,14 @@
 {
-  "name": "roomroom-api",
+  "name": "roomroom",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon ./dist/index.js",
-    "build": "tsc --build --clean && tsc --build",
-    "test": "jest"
+    "server:start": "nodemon ./dist/index.js",
+    "server:build": "tsc --build --clean && tsc --build",
+    "server:test": "jest",
+    "client:start": "cd client && npm run start",
+    "client:build": "cd client && npm run build",
+    "client:test": "cd client && npm run test",
+    "start": "concurrently \"npm run server:start\" \"npm run client:start\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.218.0",
@@ -40,6 +44,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
+    "concurrently": "^8.0.1",
     "eslint": "^8.26.0",
     "jest": "^29.3.1",
     "nodemon": "^2.0.20",

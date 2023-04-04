@@ -18,6 +18,7 @@ import cors, { CorsOptions } from "cors";
 import env from "./env";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
+import path from "path";
 
 const app = express();
 
@@ -44,7 +45,7 @@ const sess: SessionOptions = {
     domain: env.CLIENT_DOMAIN,
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24,
-    sameSite: "none",
+    sameSite: "strict",
   },
   store: new (connectPg(session))({ pool, tableName: "sessions" }),
 };
@@ -70,6 +71,10 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
   done(null, user as Express.User);
 });
+
+if (env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, "../client/build")));
+}
 
 app.use("/auth", authRouter);
 app.use("/", userRouter);
