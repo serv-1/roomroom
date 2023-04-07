@@ -38,7 +38,7 @@ const ProfilePage = () => {
         {isSessionUser && <div className="dark:text-blue-50">{user.email}</div>}
       </div>
       <section>
-        <h2 className="mb-2 text-center text-4 dark:text-blue-50">Seen in</h2>
+        <h2 className="text-4 mb-2 text-center dark:text-blue-50">Seen in</h2>
         {rooms.length ? (
           <ul className="m-auto flex max-w-[432px] flex-col gap-y-2 md:gap-y-3">
             {rooms.map((room) => (
@@ -54,7 +54,7 @@ const ProfilePage = () => {
             ))}
           </ul>
         ) : (
-          <div>No Chat Rooms</div>
+          <div className="text-center dark:text-blue-50">No Chat Rooms</div>
         )}
       </section>
     </div>

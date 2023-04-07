@@ -14,7 +14,7 @@ import inviteRouter from "./routers/invite";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import passport from "passport";
-import cors, { CorsOptions } from "cors";
+import cors from "cors";
 import env from "./env";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
@@ -22,18 +22,29 @@ import path from "path";
 
 const app = express();
 
-const limiter = rateLimit({
+const s3Url = `https://${env.AWS_BUCKET}.s3.${env.AWS_REGION}.amazonaws.com`;
+const _helmet = helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      connectSrc: ["'self'", s3Url],
+      imgSrc: ["'self'", "data:", s3Url],
+    },
+  },
+});
+
+const _rateLimit = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 30,
   legacyHeaders: false,
   standardHeaders: true,
 });
 
-const corsOptions: CorsOptions = {
+const _cors = cors({
   origin: env.CLIENT_URL,
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
-};
+});
 
 const sess: SessionOptions = {
   name: "sId",
@@ -58,9 +69,9 @@ if (env.NODE_ENV === "production") {
 export const sessionParser = session(sess);
 
 app.use(compression());
-app.use(limiter);
-app.use(helmet());
-app.use(cors(corsOptions));
+app.use(_rateLimit);
+app.use(_helmet);
+app.use(_cors);
 app.use(sessionParser);
 app.use(passport.session());
 
@@ -77,15 +88,15 @@ if (env.NODE_ENV === "production") {
 }
 
 app.use("/auth", authRouter);
-app.use("/", userRouter);
-app.use("/", userRoomsRouter);
-app.use("/", roomsRouter);
-app.use("/", roomsSearchRouter);
-app.use("/", roomsIdRouter);
-app.use("/", csrfRouter);
-app.use("/", usersIdRouter);
-app.use("/", messagesRoomIdRouter);
-app.use("/", inviteRouter);
+app.use(userRouter);
+app.use(userRoomsRouter);
+app.use(roomsRouter);
+app.use(roomsSearchRouter);
+app.use(roomsIdRouter);
+app.use(csrfRouter);
+app.use(usersIdRouter);
+app.use(messagesRoomIdRouter);
+app.use(inviteRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({ error: "Not Found" });

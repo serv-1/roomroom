@@ -48,7 +48,7 @@ const message = async (
 
     await db.query(
       `INSERT INTO members ("userId", "roomId", "lastMsgSeenId") VALUES ($1, $2, $3)`,
-      [ws.userId, roomId, lastMsg.id],
+      [ws.userId, roomId, lastMsg ? lastMsg.id : null],
     );
   }
 

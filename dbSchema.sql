@@ -28,7 +28,7 @@ CREATE TABLE "members" (
   "userId" integer NOT NULL,
   "roomId" integer NOT NULL,
 	"banned" boolean NOT NULL DEFAULT false,
-	"lastMsgSeenId" integer NOT NULL
+	"lastMsgSeenId" integer
 );
 
 CREATE TABLE "messages" (
