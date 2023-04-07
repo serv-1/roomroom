@@ -27,8 +27,8 @@ const _helmet = helmet({
   crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: {
     directives: {
-      connectSrc: ["'self'", s3Url],
-      imgSrc: ["'self'", "data:", s3Url],
+      connectSrc: [s3Url, "'self'", "https://*.giphy.com"],
+      imgSrc: [s3Url, "'self'", "data:", "https://*.giphy.com"],
     },
   },
 });
@@ -83,9 +83,9 @@ passport.deserializeUser((user, done) => {
   done(null, user as Express.User);
 });
 
-if (env.NODE_ENV === "production") {
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
-}
+// if (env.NODE_ENV === "production") {
+app.use(express.static(path.resolve(__dirname, "../client/build")));
+// }
 
 app.use("/auth", authRouter);
 app.use(userRouter);
