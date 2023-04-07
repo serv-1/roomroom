@@ -9,6 +9,7 @@ import signOut from "../../middlewares/signOut";
 import verifyCsrfToken from "../../middlewares/verifyCsrfToken";
 import { emailSchema } from "../auth";
 import type { RoomMessage } from "../rooms/[id]";
+import type { User } from "../users/[id]";
 
 const updateUserSchema = object({
   name: string()
@@ -145,6 +146,15 @@ router
       }
 
       if (objects.length) await deleteImage(objects);
+
+      const image = (
+        await db.query<Pick<User, "image">>(
+          `SELECT image FROM users WHERE id=$1`,
+          [userId],
+        )
+      ).rows[0].image;
+
+      if (image) await deleteImage(image);
 
       await db.query(`DELETE FROM users WHERE id=$1`, [userId]);
 
