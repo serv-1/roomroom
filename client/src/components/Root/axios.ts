@@ -2,7 +2,11 @@ import _axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const xsrfHeaderName = "x-csrf-token";
 
-const _a = _axios.create({ withCredentials: true, xsrfHeaderName });
+const _a = _axios.create({
+  baseURL: "/api/",
+  withCredentials: true,
+  xsrfHeaderName,
+});
 
 interface Options<D> {
   data?: D | undefined;
