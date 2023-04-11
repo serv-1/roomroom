@@ -29,6 +29,7 @@ const _helmet = helmet({
     directives: {
       connectSrc: [s3Url, "'self'", "https://*.giphy.com"],
       imgSrc: [s3Url, "'self'", "data:", "https://*.giphy.com"],
+      mediaSrc: [s3Url, "'self'"],
     },
   },
 });

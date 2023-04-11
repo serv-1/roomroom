@@ -185,7 +185,7 @@ router
       message.videos?.forEach((video) => objects.push({ Key: video }));
     }
 
-    await deleteImage(objects);
+    if (objects.length > 0) await deleteImage(objects);
 
     await db.query(`DELETE FROM rooms WHERE id=$1`, [id]);
 
