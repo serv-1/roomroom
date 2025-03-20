@@ -1,5 +1,6 @@
 import { Pool, QueryArrayConfig, QueryConfig, QueryResultRow } from "pg";
 import env from "../env";
+import { readFileSync } from "fs";
 
 export const pool = new Pool({
   user: env.PG_USER,
@@ -7,7 +8,9 @@ export const pool = new Pool({
   database: env.PG_DATABASE,
   password: env.PG_PASSWORD,
   port: +env.PG_PORT,
-  ssl: env.NODE_ENV === "production",
+  ssl: {
+    ca: readFileSync("src/db/ca.crt").toString(),
+  },
 });
 
 export const query = async <

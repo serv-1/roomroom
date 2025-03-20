@@ -28,8 +28,12 @@ const magicLogin = new MagicLoginStrategy({
             Name: "RoomRoom",
           },
           To: [{ Email: destination }],
-          Subject: "Sign in by Email",
-          HTMLPart: `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>RoomRoom - Sign in by Email</title><style type="text/css">*{margin:0}html{font-family:Arial,sans-serif;font-size:16px;line-height:1.5rem}body{margin:1rem}h1{font-size:2.25rem;line-height:1.5rem;margin-bottom:2rem}h1,p,span{color:#000}a{display:inline-block;letter-spacing:1px;font-weight:700;text-decoration:none;background-color:#2563eb;border-radius:8px;padding:12px;margin:.5rem 0 2rem 0}a span{color:#eff6ff}</style></head><body itemscope itemtype="http://schema.org/EmailMessage"><table><tr><td><h1>Welcome!</h1></td></tr><tr><td><p>Click on the link to sign in.</p></td></p></td></tr><tr><td><a href="${url}"><span>Sign in</span></a></td></tr><tr><td><span>- The RoomRoom Team</span></td></tr></table></body></html>`,
+          Subject: "Sign in Link",
+          HTMLPart: `
+						<h1>Welcome</h1>
+						<p>Please click on the link below to sign in:</p>
+						<a href="${url}">Sign in</a>
+					`,
         },
       ],
     });
