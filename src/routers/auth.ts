@@ -70,11 +70,9 @@ const google = new GoogleStrategy(
     clientSecret: env.GOOGLE_SECRET,
     callbackURL: env.SERVER_URL + "/auth/google/callback",
     scope: ["email"],
-    state: true,
   },
   async (accessToken, refreshToken, profile, cb) => {
-    type Email = { value: string; verified: "true" | "false" };
-    const email = ((profile.emails as Email[])[0] as Email).value;
+    const email = profile._json.email as string;
 
     try {
       let result = await db.query<{ id: number }>(
